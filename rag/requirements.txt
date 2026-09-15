@@ -1,0 +1,6 @@
+mcp
+chromadb
+sentence-transformers
+openai
+python-frontmatter
+python-dotenv

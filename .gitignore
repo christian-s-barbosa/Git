@@ -1,0 +1,12 @@
+# Python
+__pycache__/
+*.pyc
+
+# Ambiente virtual
+rag/.venv/
+
+# Índice vetorial (gerado)
+rag/chroma/
+
+# Segredos
+rag/.env
