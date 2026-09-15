@@ -2,6 +2,8 @@
 
 Repositório com uma base de conhecimento de Git (em Markdown) e uma implementação de **RAG** (Retrieval-Augmented Generation) que expõe a base como um **servidor MCP** local. Assim, assistentes compatíveis com MCP (como o [opencode](https://opencode.ai)) podem consultar e responder perguntas sobre o conteúdo.
 
+O motor do RAG fica na biblioteca **[ragcore](https://github.com/christian-s-barbosa/ragcore)**. Este repositório guarda apenas o **conteúdo** e a **configuração**.
+
 ## Estrutura
 
 ```
@@ -12,11 +14,8 @@ Repositório com uma base de conhecimento de Git (em Markdown) e uma implementa�
 ├── GitHub/            # Recursos do GitHub (8 arquivos)
 ├── Comando/           # Cheatsheets: Básicos, Intermediario e Avançado
 ├── index.md           # Índice geral da base
-├── rag/               # Código do RAG e do servidor MCP
-│   ├── config.py      # Caminhos e configurações
-│   ├── core.py        # Busca, rerank e chamada ao LLM
-│   ├── index.py       # Gera o índice vetorial
-│   ├── query.py       # Teste via linha de comando
+├── rag/               # Configuração do RAG (usa a lib ragcore)
+│   ├── config.py      # Settings (vault, coleção, modelos)
 │   ├── mcp_server.py  # Servidor MCP (tools buscar_git e responder_git)
 │   ├── requirements.txt
 │   └── .env.example
@@ -69,7 +68,7 @@ O RAG é exposto por um servidor **MCP** com duas ferramentas:
 # 1. Criar o ambiente virtual
 python -m venv rag/.venv
 
-# 2. Instalar as dependências
+# 2. Instalar as dependências (inclui a biblioteca ragcore)
 rag/.venv/Scripts/pip install -r rag/requirements.txt
 ```
 
@@ -87,22 +86,16 @@ Edite `rag/.env`:
 
 ```dotenv
 DEEPSEEK_API_KEY=sua_chave_aqui
-DEEPSEEK_BASE_URL=https://api.deepseek.com
-DEEPSEEK_MODEL=deepseek-chat
-EMBED_MODEL=BAAI/bge-m3
-RERANK_MODEL=BAAI/bge-reranker-v2-m3
-USE_RERANK=false
-CHUNK_MAX_CHARS=1200
 ```
 
-> O DeepSeek é usado apenas para a **geração** da resposta. Os embeddings rodam localmente com o `bge-m3` (não precisa de chave).
+> As demais opções (modelos, rerank, chunk) ficam em `rag/config.py`. O DeepSeek é usado apenas para a **geração**; os embeddings rodam localmente com o `bge-m3` (não precisa de chave).
 
 ## Indexação
 
 Gera o índice vetorial a partir dos arquivos `.md`:
 
 ```powershell
-rag/.venv/Scripts/python rag/index.py
+rag/.venv/Scripts/python -m ragcore --config rag/config.py index
 ```
 
 - Na primeira execução, baixa o modelo `bge-m3` (~2 GB).
@@ -112,7 +105,7 @@ rag/.venv/Scripts/python rag/index.py
 ## Teste pela linha de comando
 
 ```powershell
-rag/.venv/Scripts/python rag/query.py "como desfazer o último commit já enviado?"
+rag/.venv/Scripts/python -m ragcore --config rag/config.py query "como desfazer o último commit já enviado?"
 ```
 
 ## Uso como MCP (opencode)
@@ -134,7 +127,7 @@ O arquivo `opencode.json` já registra o servidor:
 
 Passos:
 
-1. Gere o índice (`rag/index.py`).
+1. Gere o índice (comando de Indexação acima).
 2. **Feche e reabra o opencode** para carregar o MCP.
 3. As tools `buscar_git` e `responder_git` ficarão disponíveis.
 
@@ -143,18 +136,22 @@ Passos:
 ## Observações sobre memória
 
 - O `bge-m3` usa ~3–4 GB de RAM.
-- Com o reranker (`USE_RERANK=true`), o pico sobe para ~6–8 GB.
-- Em máquinas com pouca RAM, mantenha `USE_RERANK=false` ou use um reranker menor (`RERANK_MODEL=BAAI/bge-reranker-base`).
+- Com o reranker (`use_rerank=True`), o pico sobe para ~6–8 GB.
+- Em máquinas com pouca RAM, mantenha `use_rerank=False` ou use um reranker menor (`rerank_model="BAAI/bge-reranker-base"`).
 
 ## Personalização
 
-| Variável (`rag/.env`) | Para que serve |
+As opções ficam em `rag/config.py` (dataclass `Settings`):
+
+| Campo | Para que serve |
 | --- | --- |
-| `EMBED_MODEL` | Modelo de embeddings (multilíngue) |
-| `RERANK_MODEL` | Modelo de rerank |
-| `USE_RERANK` | Liga/desliga o rerank |
-| `CHUNK_MAX_CHARS` | Tamanho máximo de cada chunk |
-| `DEEPSEEK_MODEL` | Modelo de geração (`deepseek-chat` ou `deepseek-reasoner`) |
+| `embed_model` | Modelo de embeddings (multilíngue) |
+| `rerank_model` | Modelo de rerank |
+| `use_rerank` | Liga/desliga o rerank |
+| `chunk_max_chars` | Tamanho máximo de cada chunk |
+| `metadata_fields` | Campos do frontmatter indexados |
+| `llm_model` | Modelo de geração (`deepseek-chat` ou `deepseek-reasoner`) |
+| `top_k` / `top_n` | Quantos recuperar / quantos enviar ao LLM |
 
 ## O que não é versionado
 

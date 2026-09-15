@@ -1,6 +1,1 @@
-mcp
-chromadb
-sentence-transformers
-openai
-python-frontmatter
-python-dotenv
+ragcore[mcp] @ git+https://github.com/christian-s-barbosa/ragcore.git
