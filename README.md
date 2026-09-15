@@ -2,7 +2,7 @@
 
 Repositório com uma base de conhecimento de Git (em Markdown) e uma implementação de **RAG** (Retrieval-Augmented Generation) que expõe a base como um **servidor MCP** local. Assim, assistentes compatíveis com MCP (como o [opencode](https://opencode.ai)) podem consultar e responder perguntas sobre o conteúdo.
 
-O motor do RAG fica na biblioteca **[ragcore](https://github.com/christian-s-barbosa/ragcore)**. Este repositório guarda apenas o **conteúdo** e a **configuração**.
+O motor do RAG fica na biblioteca **[personalrag](https://github.com/christian-s-barbosa/personalrag)**. Este repositório guarda apenas o **conteúdo** e a **configuração**.
 
 ## Estrutura
 
@@ -14,7 +14,7 @@ O motor do RAG fica na biblioteca **[ragcore](https://github.com/christian-s-bar
 ├── GitHub/            # Recursos do GitHub (8 arquivos)
 ├── Comando/           # Cheatsheets: Básicos, Intermediario e Avançado
 ├── index.md           # Índice geral da base
-├── rag/               # Configuração do RAG (usa a lib ragcore)
+├── rag/               # Configuração do RAG (usa a lib personalrag)
 │   ├── config.py      # Settings (vault, coleção, modelos)
 │   ├── mcp_server.py  # Servidor MCP (tools buscar_git e responder_git)
 │   ├── requirements.txt
@@ -68,7 +68,7 @@ O RAG é exposto por um servidor **MCP** com duas ferramentas:
 # 1. Criar o ambiente virtual
 python -m venv rag/.venv
 
-# 2. Instalar as dependências (inclui a biblioteca ragcore)
+# 2. Instalar as dependências (inclui a biblioteca personalrag)
 rag/.venv/Scripts/pip install -r rag/requirements.txt
 ```
 
@@ -95,7 +95,7 @@ DEEPSEEK_API_KEY=sua_chave_aqui
 Gera o índice vetorial a partir dos arquivos `.md`:
 
 ```powershell
-rag/.venv/Scripts/python -m ragcore --config rag/config.py index
+rag/.venv/Scripts/python -m personalrag --config rag/config.py index
 ```
 
 - Na primeira execução, baixa o modelo `bge-m3` (~2 GB).
@@ -105,7 +105,7 @@ rag/.venv/Scripts/python -m ragcore --config rag/config.py index
 ## Teste pela linha de comando
 
 ```powershell
-rag/.venv/Scripts/python -m ragcore --config rag/config.py query "como desfazer o último commit já enviado?"
+rag/.venv/Scripts/python -m personalrag --config rag/config.py query "como desfazer o último commit já enviado?"
 ```
 
 ## Uso como MCP (opencode)
