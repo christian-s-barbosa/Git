@@ -2,7 +2,7 @@ from pathlib import Path
 
 from dotenv import load_dotenv
 
-from vault_rag import Settings
+from ragcorelib import Settings
 
 HERE = Path(__file__).resolve().parent
 load_dotenv(HERE / ".env")

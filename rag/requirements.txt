@@ -1,1 +1,1 @@
-vault-rag[mcp]
+ragcorelib[mcp]
