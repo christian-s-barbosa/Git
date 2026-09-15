@@ -1,1 +1,1 @@
-ragcorelib[mcp]
+personalrag[mcp]
